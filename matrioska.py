@@ -1,3 +1,21 @@
+# ------------------------------------#
+# Author: Alejandro Serrano Borlaff
+# Instituto de Astrofisica de Canarias
+# asborlaff@gmail.com
+#
+# v1.0 - 16 May 2018 - First working version.
+#
+# Input:
+#    target_name: Fits to be analysed
+#    xcen and ycen: Coordinates of the center of the object.
+#    incl: Inclination of the object (incl = np.cos^-1(b/a))
+#    PA: Position angle of the mayor axis, measured from the positive y-axis.
+#    size: Max radius to calculate the profile.
+#    c: Generatization of ellipse, "disky" (c<0), or "boxy" (c>0): Default=0.
+#    mask_name : Name of the fits file that contain the elliptical apertures.
+#    nsimul: Number of bootstrapping simulations for bootmedian
+#######################################
+
 import os
 import bootmedian as bm
 from astropy.io import fits
@@ -13,7 +31,7 @@ def matrioska(target_name, xcen, ycen, incl, PA, nbins, size, c=0,
     mask_fits = fits.open(mask_name)
     r = np.linspace(start=0, stop=size, num=nbins+1)
     r_mids = np.zeros(nbins)
-    profile = np.zeros(shape=(8,len(r)), dtype="float32")
+    profile = np.zeros(shape=(8, len(r)), dtype="float32")
     for i in range(len(r_mids)):
         index = [(mask_fits[0].data > r[i]) & (mask_fits[0].data < r[i+1])]
         r_mids[i] = np.mean(mask_fits[0].data[index])
