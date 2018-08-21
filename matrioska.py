@@ -22,11 +22,11 @@ from astropy.io import fits
 import numpy as np
 
 
-def matrioska(target_name, xcen, ycen, incl, PA, nbins, size, c=0,
+def matrioska(target_name, target_ext, xcen, ycen, incl, PA, nbins, size, c=0,
               mask_name="default_radial.fits", nsimul=1000):
 
     target_fits = fits.open(target_name)
-    radial_mask(target_name=target_name, xcen=xcen, ycen=ycen, incl=incl,
+    radial_mask(target_name=target_name, target_ext=target_ext, xcen=xcen, ycen=ycen, incl=incl,
                 PA=PA, c=c, mask_name=mask_name)
     mask_fits = fits.open(mask_name)
     r = np.linspace(start=0, stop=size, num=nbins+1)
@@ -36,7 +36,7 @@ def matrioska(target_name, xcen, ycen, incl, PA, nbins, size, c=0,
         index = [(mask_fits[0].data > r[i]) & (mask_fits[0].data < r[i+1])]
         r_mids[i] = np.mean(mask_fits[0].data[index])
         print(r_mids[i])
-        result = [r_mids[i]] + bm.bootmedian(sample_input=target_fits[0].data[index],
+        result = [r_mids[i]] + bm.bootmedian(sample_input=target_fits[target_ext].data[index],
                                              nsimul=nsimul, errors=1).tolist()
         profile[:, i] = result
 
@@ -53,17 +53,17 @@ def matrioska(target_name, xcen, ycen, incl, PA, nbins, size, c=0,
     return(output)
 
 
-def radial_mask(target_name, incl, PA, c=0,  xcen=0, ycen=0,
+def radial_mask(target_name, target_ext, incl, PA, c=0,  xcen=0, ycen=0,
                 mask_name="default_radial.fits"):
     target_fits = fits.open(target_name)
     if((xcen == 0) & (ycen == 0)):
-        xcen = target_fits[0].header['NAXIS1']/2
-        ycen = target_fits[0].header['NAXIS2']/2
-    sizex = target_fits[0].header['NAXIS1']
-    sizey = target_fits[0].header['NAXIS2']
+        xcen = target_fits[target_ext].header['NAXIS1']/2
+        ycen = target_fits[target_ext].header['NAXIS2']/2
+    sizex = target_fits[target_ext].header['NAXIS1']
+    sizey = target_fits[target_ext].header['NAXIS2']
     q = np.cos(np.radians(incl))
     # def mask_ellipse(mask_name, sizex, sizey, xcen, ycen, q, PA, c):
-    mask_ellipse(mask_name=mask_name, sizex=sizex, sizey=sizey, xcen=ycen,
+    mask_ellipse(mask_name=mask_name, sizex=sizey, sizey=sizex, xcen=ycen,
                  ycen=xcen, q=q, PA=PA, c=c)
 
 
