@@ -33,7 +33,7 @@ def matrioska(target_name, target_ext, xcen, ycen, incl, PA, nbins, size, c=0,
     r_mids = np.zeros(nbins)
     profile = np.zeros(shape=(8, len(r)), dtype="float32")
     for i in range(len(r_mids)):
-        index = [(mask_fits[0].data > r[i]) & (mask_fits[0].data < r[i+1])]
+        index = [(mask_fits[0].data >= r[i]) & (mask_fits[0].data < r[i+1])]
         r_mids[i] = np.mean(mask_fits[0].data[index])
         print(r_mids[i])
         result = [r_mids[i]] + bm.bootmedian(sample_input=target_fits[target_ext].data[index],
